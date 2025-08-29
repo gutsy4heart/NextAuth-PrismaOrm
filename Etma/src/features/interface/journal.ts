@@ -6,6 +6,7 @@ export interface Episode {
   characters: string[];
   url?: string;
   created?: string;
+  quantity?: number; // Количество эпизодов в корзине
 }
 
 export interface Character {

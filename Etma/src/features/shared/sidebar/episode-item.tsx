@@ -2,14 +2,14 @@
 
 import { Episode } from "@/features/interface/journal";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Calendar, Play, Hash, Trash } from "lucide-react";
+import { Calendar, Play, Hash, Trash, Plus, Minus } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useCardStore } from "@/features/store/card-store";
 
 export default function EpisodeItem({ data }: { data: Episode }) {
-
-    const { removeItem } = useCardStore();
+  const { removeItem, updateQuantity } = useCardStore();
+  
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
       month: "short",
@@ -27,6 +27,20 @@ export default function EpisodeItem({ data }: { data: Episode }) {
       return `S${season}E${episode}`;
     }
     return episodeCode;
+  };
+
+  const handleIncreaseQuantity = () => {
+    const currentQuantity = data.quantity || 1;
+    updateQuantity(data.id, currentQuantity + 1);
+  };
+
+  const handleDecreaseQuantity = () => {
+    const currentQuantity = data.quantity || 1;
+    if (currentQuantity > 1) {
+      updateQuantity(data.id, currentQuantity - 1);
+    } else {
+      removeItem(data.id);
+    }
   };
 
   return (
@@ -51,10 +65,40 @@ export default function EpisodeItem({ data }: { data: Episode }) {
             <span>View Episode</span>
           </Link>
         </div>
+        
+        {/* Счетчик количества */}
+        <div className="flex items-center justify-between bg-white/10 rounded-lg p-2 mt-3">
+          <span className="text-xs text-white/70">Quantity:</span>
+          <div className="flex items-center gap-2">
+            <Button
+              onClick={handleDecreaseQuantity}
+              size="sm"
+              variant="outline"
+              className="h-6 w-6 p-0 border-white/20 text-white hover:bg-white/20"
+            >
+              <Minus className="h-3 w-3" />
+            </Button>
+            <span className="text-white font-medium min-w-[20px] text-center">
+              {data.quantity || 1}
+            </span>
+            <Button
+              onClick={handleIncreaseQuantity}
+              size="sm"
+              variant="outline"
+              className="h-6 w-6 p-0 border-white/20 text-white hover:bg-white/20"
+            >
+              <Plus className="h-3 w-3" />
+            </Button>
+          </div>
+        </div>
       </CardContent>
       <CardFooter className="absolute bottom-12 right-0">
-        <Button onClick={() => removeItem(data.id)} size="icon" className="border border-red-600 transition-all duration-300 cursor-pointer hover:bg-red-200">
-            <Trash className="text-red-600"/>
+        <Button 
+          onClick={() => removeItem(data.id)} 
+          size="icon" 
+          className="border border-red-600 transition-all duration-300 cursor-pointer hover:bg-red-200"
+        >
+          <Trash className="text-red-600"/>
         </Button>
       </CardFooter>
     </Card>
